@@ -66,11 +66,10 @@ public class BasicLoginPasswordFilter extends GenericFilterBean {
 
         //Create security context for user
 
-        List<GrantedAuthority> roles = Collections.singletonList(
-                new SimpleGrantedAuthority("ROLE_" + login.toUpperCase())
-        );
+        Authentication auth = new Authentication() {
 
-        Authentication authentication = new Authentication() {
+            boolean authentication;
+
             @Override
             public Collection<? extends GrantedAuthority> getAuthorities() {
                 return Collections.singletonList(
@@ -80,7 +79,7 @@ public class BasicLoginPasswordFilter extends GenericFilterBean {
 
             @Override
             public Object getCredentials() {
-                return login;
+                return password;
             }
 
             @Override
@@ -95,12 +94,12 @@ public class BasicLoginPasswordFilter extends GenericFilterBean {
 
             @Override
             public boolean isAuthenticated() {
-                return true;
+                return authentication;
             }
 
             @Override
             public void setAuthenticated(boolean isAuthenticated) throws IllegalArgumentException {
-
+                this.authentication = isAuthenticated;
             }
 
             @Override
@@ -108,8 +107,8 @@ public class BasicLoginPasswordFilter extends GenericFilterBean {
                 return login;
             }
         };
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        auth.setAuthenticated(true);
+        SecurityContextHolder.getContext().setAuthentication(auth);
 
 
         //Go on next filters
